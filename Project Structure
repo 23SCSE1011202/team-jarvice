@@ -1,0 +1,31 @@
+Healthcare-Management-System/
+│
+├── src/                  # Source code directory
+│   ├── main/             
+│   │   ├── java/         # Java source files
+│   │   │   ├── com/
+│   │   │   │   ├── hms/
+│   │   │   │   │   ├── controller/  # REST Controllers or Servlets
+│   │   │   │   │   ├── model/       # Entity/Model classes (e.g., Patient, Doctor)
+│   │   │   │   │   ├── repository/  # Database interaction (DAO/Repositories)
+│   │   │   │   │   ├── service/     # Business logic
+│   │   │   │   │   ├── exception/   # Custom exceptions
+│   │   │   │   │   └── utils/       # Utility functions and classes
+│   │   │   │   ├── Application.java  # Main entry point of the app
+│   │   │   │   
+│   │   └── resources/    # Configuration files, static assets, etc.
+│   │       ├── application.properties  # Database, app config
+│   │       ├── static/     # Static resources (JS, CSS)
+│   │       └── templates/  # Template files (for web interfaces)
+│   └── test/              # Unit tests
+│       ├── java/          # Test classes
+│       └── resources/     # Test resources
+│
+├── build/                 # Compiled code (for example, from Gradle or Maven)
+├── lib/                   # External libraries (if not using a build tool like Maven)
+├── database/              # Database scripts (e.g., SQL files for schema, seed data)
+├── .gitignore             # Git ignore file
+├── pom.xml                # Maven build file (if using Maven)
+├── build.gradle           # Gradle build file (if using Gradle)
+├── README.md              # Project documentation
+└── LICENSE                # License for the project
