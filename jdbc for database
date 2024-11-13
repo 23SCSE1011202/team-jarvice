@@ -1,0 +1,15 @@
+a. My sql database
+CREATE DATABASE healthcare_management_system;
+USE healthcare_management_system;
+
+b. Add JDBC Driver to your project
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.29</version> <!-- Use the latest version -->
+</dependency>
+
+dependencies {
+    implementation 'mysql:mysql-connector-java:8.0.29' // Use the latest version
+}
+
