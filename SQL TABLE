@@ -1,0 +1,108 @@
+1. Create database
+CREATE DATABASE healthcare_management_system;
+USE healthcare_management_system;
+2. Create table
+CREATE TABLE Patient (
+    patient_id INT AUTO_INCREMENT PRIMARY KEY,           -- Unique patient identifier
+    first_name VARCHAR(100) NOT NULL,                    -- Patient's first name
+    last_name VARCHAR(100) NOT NULL,                     -- Patient's last name
+    date_of_birth DATE,                                  -- Patient's date of birth
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,     -- Gender of the patient
+    email VARCHAR(150) UNIQUE,                           -- Unique email
+    phone VARCHAR(15),                                   -- Phone number
+    address TEXT,                                        -- Address of the patient
+    emergency_contact_name VARCHAR(100),                 -- Emergency contact name
+    emergency_contact_phone VARCHAR(15),                 -- Emergency contact phone
+    blood_group VARCHAR(10),                             -- Blood group (e.g., A+, B-, O+)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for record update
+);
+3. Doctor table 
+CREATE TABLE Doctor (
+    doctor_id INT AUTO_INCREMENT PRIMARY KEY,           -- Unique doctor identifier
+    first_name VARCHAR(100) NOT NULL,                    -- Doctor's first name
+    last_name VARCHAR(100) NOT NULL,                     -- Doctor's last name
+    specialization VARCHAR(100),                         -- Doctor's specialization (e.g., Cardiology, Pediatrics)
+    email VARCHAR(150) UNIQUE,                           -- Unique email
+    phone VARCHAR(15),                                   -- Phone number
+    department_id INT,                                   -- Department ID (optional)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for record update
+    FOREIGN KEY (department_id) REFERENCES Department(department_id) -- Department foreign key (optional)
+);
+4. Department table
+CREATE TABLE Department (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,       -- Unique department identifier
+    name VARCHAR(100) NOT NULL,                          -- Department name
+    description TEXT                                     -- Department description
+);
+
+5. Appointment table
+CREATE TABLE Appointment (
+    appointment_id INT AUTO_INCREMENT PRIMARY KEY,      -- Unique appointment identifier
+    patient_id INT,                                     -- Foreign key to Patient
+    doctor_id INT,                                      -- Foreign key to Doctor
+    appointment_date DATETIME NOT NULL,                 -- Date and time of the appointment
+    status ENUM('Scheduled', 'Completed', 'Canceled') DEFAULT 'Scheduled', -- Appointment status
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for record update
+    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id), -- Link to Patient
+    FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id)  -- Link to Doctor
+);
+6. Medicak record table
+CREATE TABLE MedicalRecord (
+    record_id INT AUTO_INCREMENT PRIMARY KEY,           -- Unique record identifier
+    patient_id INT,                                     -- Foreign key to Patient
+    appointment_id INT,                                 -- Foreign key to Appointment
+    diagnosis TEXT,                                     -- Diagnosis details
+    treatment TEXT,                                     -- Treatment given
+    prescription TEXT,                                  -- Prescription details
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for record update
+    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id), -- Link to Patient
+    FOREIGN KEY (appointment_id) REFERENCES Appointment(appointment_id) -- Link to Appointment
+);
+7. bill table
+CREATE TABLE Bill (
+    bill_id INT AUTO_INCREMENT PRIMARY KEY,             -- Unique bill identifier
+    patient_id INT,                                     -- Foreign key to Patient
+    amount DECIMAL(10, 2) NOT NULL,                      -- Total amount for the bill
+    bill_date DATETIME NOT NULL,                         -- Date the bill was generated
+    payment_status ENUM('Pending', 'Paid', 'Overdue') DEFAULT 'Pending', -- Status of payment
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for record update
+    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) -- Link to Patient
+);
+8. prescription table
+CREATE TABLE Prescription (
+    prescription_id INT AUTO_INCREMENT PRIMARY KEY,     -- Unique prescription identifier
+    record_id INT,                                      -- Foreign key to MedicalRecord
+    medication_name VARCHAR(255) NOT NULL,               -- Medication name
+    dosage VARCHAR(100),                                -- Dosage instructions
+    frequency VARCHAR(100),                             -- Frequency of medication (e.g., Once a day)
+    duration VARCHAR(100),                              -- Duration of the treatment
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for record update
+    FOREIGN KEY (record_id) REFERENCES MedicalRecord(record_id) -- Link to Medical Record
+);
+9. Operational table
+CREATE TABLE Staff (
+    staff_id INT AUTO_INCREMENT PRIMARY KEY,            -- Unique staff identifier
+    first_name VARCHAR(100) NOT NULL,                    -- Staff's first name
+    last_name VARCHAR(100) NOT NULL,                     -- Staff's last name
+    role VARCHAR(50),                                    -- Role (e.g., Nurse, Receptionist)
+    email VARCHAR(150) UNIQUE,                           -- Email (unique)
+    phone VARCHAR(15),                                   -- Phone number
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for record update
+);
+10. Inventory table
+CREATE TABLE Inventory (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,              -- Unique item identifier
+    item_name VARCHAR(255) NOT NULL,                      -- Name of the inventory item
+    quantity INT NOT NULL,                                -- Quantity in stock
+    unit_price DECIMAL(10, 2),                            -- Price per unit
+    reorder_level INT,                                    -- Minimum quantity before reorder
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,       -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for record update
+);
