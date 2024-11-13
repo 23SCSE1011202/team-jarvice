@@ -1,0 +1,62 @@
+1. @RestController
+@RequestMapping("/patients")
+public class PatientController {
+    @Autowired
+    private PatientService patientService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
+        Patient patient = patientService.findById(id);
+        return new ResponseEntity<>(patient, HttpStatus.OK);
+    }
+}
+
+2. @Entity
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String dob;
+    private String phone;
+    private String email;
+    // Getters and setters
+}
+
+3. @Repository
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+    // Custom database queries (e.g., find by email)
+    Patient findByEmail(String email);
+}
+
+4. @Service
+public class PatientService {
+    @Autowired
+    private PatientRepository patientRepository;
+
+    public Patient findById(Long id) {
+        return patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+    }
+}
+
+5. @ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+6. @SpringBootTest
+public class PatientServiceTest {
+    @Autowired
+    private PatientService patientService;
+
+    @Test
+    public void testFindPatientById() {
+        Patient patient = patientService.findById(1L);
+        assertNotNull(patient);
+        assertEquals("John Doe", patient.getName());
+    }
+}
+
+
