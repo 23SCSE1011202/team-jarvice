@@ -1,0 +1,249 @@
+1. DAO Design for Healthcare Management System
+We’ll create DAO classes for the following entities:
+
+PatientDAO: Handles operations related to the Patient table.
+DoctorDAO: Handles operations related to the Doctor table.
+AppointmentDAO: Handles operations related to the Appointment table.
+MedicalRecordDAO: Handles operations related to the MedicalRecord table.
+BillDAO: Handles operations related to the Bill table.
+PrescriptionDAO: Handles operations related to the Prescription table.
+Each DAO will have methods for the basic CRUD operations: create(), read(), update(), delete(). Below is an implementation of these DAO classes.
+
+2. Databaseconnection.java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DatabaseConnection {
+
+    // Database credentials
+    private static final String URL = "jdbc:mysql://localhost:3306/healthcare_management_system";
+    private static final String USER = "root";  // Replace with your MySQL username
+    private static final String PASSWORD = "root";  // Replace with your MySQL password
+
+    public static Connection getConnection() throws SQLException {
+        // Load MySQL JDBC driver
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new SQLException("JDBC Driver not found.");
+        }
+    }
+
+    public static void closeConnection(Connection conn) {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+3. Patient DAO class
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PatientDAO {
+
+    // Add a new patient
+    public boolean addPatient(Patient patient) {
+        String query = "INSERT INTO Patient (first_name, last_name, date_of_birth, gender, email, phone, address, emergency_contact_name, emergency_contact_phone, blood_group) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, patient.getFirstName());
+            ps.setString(2, patient.getLastName());
+            ps.setDate(3, Date.valueOf(patient.getDateOfBirth()));
+            ps.setString(4, patient.getGender());
+            ps.setString(5, patient.getEmail());
+            ps.setString(6, patient.getPhone());
+            ps.setString(7, patient.getAddress());
+            ps.setString(8, patient.getEmergencyContactName());
+            ps.setString(9, patient.getEmergencyContactPhone());
+            ps.setString(10, patient.getBloodGroup());
+
+            int result = ps.executeUpdate();
+            return result > 0; // Returns true if the insertion is successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Get patient by ID
+    public Patient getPatientById(int patientId) {
+        String query = "SELECT * FROM Patient WHERE patient_id = ?";
+        Patient patient = null;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                patient = new Patient(
+                        rs.getInt("patient_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getDate("date_of_birth").toLocalDate(),
+                        rs.getString("gender"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("emergency_contact_name"),
+                        rs.getString("emergency_contact_phone"),
+                        rs.getString("blood_group")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return patient;
+    }
+
+    // Update patient information
+    public boolean updatePatient(Patient patient) {
+        String query = "UPDATE Patient SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, email = ?, phone = ?, address = ?, emergency_contact_name = ?, emergency_contact_phone = ?, blood_group = ? WHERE patient_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, patient.getFirstName());
+            ps.setString(2, patient.getLastName());
+            ps.setDate(3, Date.valueOf(patient.getDateOfBirth()));
+            ps.setString(4, patient.getGender());
+            ps.setString(5, patient.getEmail());
+            ps.setString(6, patient.getPhone());
+            ps.setString(7, patient.getAddress());
+            ps.setString(8, patient.getEmergencyContactName());
+            ps.setString(9, patient.getEmergencyContactPhone());
+            ps.setString(10, patient.getBloodGroup());
+            ps.setInt(11, patient.getPatientId());
+
+            int result = ps.executeUpdate();
+            return result > 0; // Returns true if the update is successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Delete patient
+    public boolean deletePatient(int patientId) {
+        String query = "DELETE FROM Patient WHERE patient_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, patientId);
+            int result = ps.executeUpdate();
+            return result > 0; // Returns true if the delete is successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Get all patients
+    public List<Patient> getAllPatients() {
+        String query = "SELECT * FROM Patient";
+        List<Patient> patients = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                patients.add(new Patient(
+                        rs.getInt("patient_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getDate("date_of_birth").toLocalDate(),
+                        rs.getString("gender"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("emergency_contact_name"),
+                        rs.getString("emergency_contact_phone"),
+                        rs.getString("blood_group")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return patients;
+    }
+}
+
+4. DoctorDAO CLASSES
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DoctorDAO {
+
+    // Add a new doctor
+    public boolean addDoctor(Doctor doctor) {
+        String query = "INSERT INTO Doctor (first_name, last_name, specialization, email, phone, department_id) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, doctor.getFirstName());
+            ps.setString(2, doctor.getLastName());
+            ps.setString(3, doctor.getSpecialization());
+            ps.setString(4, doctor.getEmail());
+            ps.setString(5, doctor.getPhone());
+            ps.setInt(6, doctor.getDepartmentId());
+
+            int result = ps.executeUpdate();
+            return result > 0; // Returns true if insertion is successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Get doctor by ID
+    public Doctor getDoctorById(int doctorId) {
+        String query = "SELECT * FROM Doctor WHERE doctor_id = ?";
+        Doctor doctor = null;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                doctor = new Doctor(
+                        rs.getInt("doctor_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("specialization"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getInt("department_id")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return doctor;
+    }
+
+    // Update doctor information
+    public boolean updateDoctor(Doctor doctor) {
+        String query = "UPDATE Doctor SET first_name = ?, last_name = ?, specialization = ?, email = ?, phone = ?, department_id = ? WHERE doctor_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+           
